@@ -1,0 +1,4 @@
+keytool   -importkeystore   -srckeystore keystore.jceks   -destkeystore keystore3.p12   -srcstoretype JCEKS   -deststoretype PKCS12
+
+
+https://stackoverflow.com/questions/2846828/converting-jks-to-p12
