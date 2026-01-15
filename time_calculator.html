@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时间加法器 - 现代化的时间计算小工具</title>
+    <style>
+        :root {
+            --primary-color: #7c4dff;
+            --secondary-color: #448aff;
+            --bg-gradient: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-color: #e0e0e0;
+            --accent-glow: 0 0 20px rgba(124, 77, 255, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        /* 动态背景装饰 */
+        .blobs {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            background: var(--primary-color);
+            filter: blur(80px);
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: move 20s infinite alternate;
+        }
+
+        .blob1 {
+            width: 400px;
+            height: 400px;
+            top: -100px;
+            left: -100px;
+        }
+
+        .blob2 {
+            width: 300px;
+            height: 300px;
+            bottom: -50px;
+            right: -50px;
+            background: var(--secondary-color);
+            animation-delay: -5s;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0) scale(1);
+            }
+
+            to {
+                transform: translate(100px, 50px) scale(1.1);
+            }
+        }
+
+        .container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            background: linear-gradient(to right, #fff, #bbb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .current-time {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .current-time span {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .inputs-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            /* 如果空间不足则换行 */
+        }
+
+        .input-field {
+            flex: 1;
+            min-width: 140px;
+            /* 确保在小屏幕上也有合理宽度 */
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            text-align: left;
+        }
+
+        label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #aaa;
+            padding-left: 4px;
+        }
+
+        input {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: white;
+            font-size: 18px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            box-shadow: var(--accent-glow);
+            transform: scale(1.02);
+        }
+
+        /* 按钮样式 */
+        .btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 15px rgba(124, 77, 255, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(124, 77, 255, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        /* 结果显示区 */
+        .result-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 10px;
+            border: 1px dashed var(--glass-border);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .result-label {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .result-time {
+            font-size: 36px;
+            font-weight: 800;
+            color: #b392ff;
+            /* 调浅色值以提升对比度和可读性 */
+            text-shadow: var(--accent-glow);
+        }
+
+        .result-date {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 11px;
+            color: #555;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 400px) {
+            .container {
+                padding: 24px;
+            }
+
+            .result-time {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="blobs">
+        <div class="blob blob1"></div>
+        <div class="blob blob2"></div>
+    </div>
+
+    <div class="container">
+        <h1>时间加法器</h1>
+
+        <div class="current-time">
+            当前时间: <span id="current-time-display">--:--:--</span>
+        </div>
+
+        <div class="inputs-group">
+            <div class="input-field">
+                <label for="hours">增加小时</label>
+                <input type="number" id="hours" value="" min="0" placeholder="0">
+            </div>
+            <div class="input-field">
+                <label for="minutes">增加分钟</label>
+                <input type="number" id="minutes" value="" min="0" placeholder="0">
+            </div>
+        </div>
+
+        <button id="calc-btn" class="btn">立即计算结果</button>
+
+        <div class="result-card">
+            <div class="result-label">计算后的时间</div>
+            <div id="result-time" class="result-time">--:--:--</div>
+            <div id="result-date" class="result-date">今天</div>
+        </div>
+
+        <div class="footer">
+            点击按钮以当前时间为准进行计算
+        </div>
+    </div>
+
+    <script>
+        const hoursInput = document.getElementById('hours');
+        const minutesInput = document.getElementById('minutes');
+        const resultTimeEl = document.getElementById('result-time');
+        const resultDateEl = document.getElementById('result-date');
+        const currentTimeDisplay = document.getElementById('current-time-display');
+        const calcBtn = document.getElementById('calc-btn');
+
+        // 执行计算
+        function runCalculation() {
+            const h = parseInt(hoursInput.value) || 0;
+            const m = parseInt(minutesInput.value) || 0;
+
+            const now = new Date();
+
+            // 更新“当前时间”显示（显示计算那一刻的时间）
+            currentTimeDisplay.textContent = now.toLocaleTimeString('zh-CN', { hour12: false });
+
+            const future = new Date(now.getTime() + (h * 60 * 60 * 1000) + (m * 60 * 1000));
+
+            // 格式化输出
+            const timeStr = future.toLocaleTimeString('zh-CN', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+
+            resultTimeEl.textContent = timeStr;
+
+            // 处理日期说明
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const futureDate = new Date(future);
+            futureDate.setHours(0, 0, 0, 0);
+
+            const diffDays = Math.round((futureDate - today) / (24 * 60 * 60 * 1000));
+
+            let dateText = '';
+            if (diffDays === 0) dateText = '今天';
+            else if (diffDays === 1) dateText = '明天';
+            else if (diffDays === 2) dateText = '后天';
+            else if (diffDays > 0) dateText = `${future.toLocaleDateString('zh-CN')}`;
+            else dateText = '过去的时间';
+
+            resultDateEl.textContent = dateText;
+
+            // 按钮点击反馈
+            resultTimeEl.style.transition = 'none';
+            resultTimeEl.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                resultTimeEl.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                resultTimeEl.style.transform = 'scale(1)';
+            }, 50);
+        }
+
+        // 按钮点击事件
+        calcBtn.addEventListener('click', runCalculation);
+
+        // 初始化显示（静态）
+        const initialNow = new Date();
+        currentTimeDisplay.textContent = initialNow.toLocaleTimeString('zh-CN', { hour12: false });
+
+        // 处理负数
+        [hoursInput, minutesInput].forEach(input => {
+            input.addEventListener('blur', () => {
+                if (parseInt(input.value) < 0) input.value = 0;
+            });
+        });
+    </script>
+</body>
+
+</html>
